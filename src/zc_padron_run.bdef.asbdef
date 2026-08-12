@@ -1,0 +1,42 @@
+projection;
+strict ( 2 );
+use draft;
+
+define behavior for ZC_PADRON_RUN alias Run
+{
+  use create;
+  use update;
+  use delete;
+
+  use action procesar;
+  use action refrescar;
+
+  use action Edit;
+  use action Activate;
+  use action Discard;
+  use action Resume;
+  use action Prepare;
+
+  use association _Log { create; with draft; }
+
+  // al ejecutar refrescar, Fiori relee cabecera y tabla del log
+  side effects
+  {
+    action refrescar affects field Estado,
+                            field TotalRegistros,
+                            field TotalMatch,
+                            field TotalBloqueados,
+                            field TotalDesbloqueados,
+                            field TotalErrores,
+                            field TotalIgnorados,
+                            entity _Log;
+  }
+}
+
+define behavior for ZC_PADRON_LOG alias Log
+{
+  use update;
+  use delete;
+
+  use association _Run { with draft; }
+}

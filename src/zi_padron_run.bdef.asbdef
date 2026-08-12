@@ -1,0 +1,84 @@
+managed with additional save implementation in class zbp_i_padron_run unique;
+strict ( 2 );
+with draft;
+
+define behavior for ZI_PADRON_RUN alias Run
+persistent table zttxt_run
+draft table zttxt_run_d
+lock master total etag LastChangedAt
+authorization master ( global, instance )
+etag master LastChangedAt
+{
+  create;
+  update;
+  delete;
+
+  static action procesar parameter ZD_PADRON_PROC_PARAM;
+
+  // boton Refrescar: accion vacia, solo dispara el side effect (declarado en projection)
+  action refrescar;
+
+  determination setEstadoInicial on save { create; }
+
+  field ( readonly ) RunId;
+  field ( numbering : managed ) RunId;
+  field ( readonly ) Estado, TotalRegistros, TotalMatch, TotalBloqueados, TotalDesbloqueados, TotalErrores, TotalIgnorados;
+
+  association _Log { create; with draft; }
+
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for zttxt_run
+  {
+    RunId              = run_id;
+    CompanyCode        = company_code;
+    ModoTest           = modo_test;
+    QuitarBloqueo      = quitar_bloqueo;
+    Estado             = estado;
+    BlockingReason     = blocking_reason;
+    Contenido          = contenido;
+    FileContent        = file_content;
+    MimeType           = mime_type;
+    FileName           = file_name;
+    NombreArchivo      = nombre_archivo;
+    TotalRegistros     = total_registros;
+    TotalMatch         = total_match;
+    TotalBloqueados    = total_bloqueados;
+    TotalDesbloqueados = total_desbloqueados;
+    TotalErrores       = total_errores;
+    TotalIgnorados     = total_ignorados;
+    CreatedBy          = created_by;
+    CreatedAt          = created_at;
+    LastChangedAt      = last_changed_at;
+  }
+}
+
+define behavior for ZI_PADRON_LOG alias Log
+persistent table zttxt_log
+draft table zttxt_log_d
+lock dependent by _Run
+authorization dependent by _Run
+etag dependent by _Run
+{
+  update;
+  delete;
+  field ( readonly ) RunId, LineNumber;
+
+  association _Run { with draft; }
+
+  mapping for zttxt_log
+  {
+    RunId        = run_id;
+    LineNumber   = line_number;
+    Cuit         = cuit;
+    Supplier     = supplier;
+    CompanyCode  = company_code;
+    Resultado    = resultado;
+    Mensaje      = mensaje;
+    CreatedAt    = created_at;
+  }
+}

@@ -1,0 +1,5 @@
+@EndUserText.label: 'Servicio Padron - corridas y log'
+define service ZUI_PADRON_RUN_O4 {
+  expose ZC_PADRON_RUN as PadronRun;
+  expose ZC_PADRON_LOG as PadronLog;
+}

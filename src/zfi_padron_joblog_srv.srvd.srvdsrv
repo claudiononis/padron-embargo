@@ -1,0 +1,5 @@
+@EndUserText.label: 'Padron Embargo JobLog Service'
+define service ZFI_PADRON_JOBLOG_SRV {
+  expose ZC_PE_JOBS as JobsSet;
+  expose ZC_PE_JOBLOGENTRIES as JobLogEntriesSet;
+}
